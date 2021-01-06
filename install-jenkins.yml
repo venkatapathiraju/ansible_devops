@@ -1,0 +1,34 @@
+---
+- hosts: webservers
+  become: true
+  tasks:
+   - name: Install open jdk 11
+     yum:
+      name: java-1.8.0-openjdk
+      state: present
+   - name: install jenkins 
+     yum_repository:
+      name: jenkins
+      state: present
+      description: official jenkins yum repo
+      baseurl: https://pkg.jenkins.io/redhat
+      gpgkey: https://pkg.jenkins.io/redhat/jenkins.io.key
+      gpgcheck: yes
+      enabled: yes
+   - name: Ensure jenkins is installed
+     yum:
+      name: jenkins
+      update_cache: yes
+      state: present
+   - name: Enable and start the jenkis service
+     service:
+      name: jenkins
+      enabled: yes
+      state: started
+   - name: Open firewall port
+     firewalld:
+      zone: public
+      port: 8080/tcp
+      permanent: true
+      state: enabled
+      immediate: true
